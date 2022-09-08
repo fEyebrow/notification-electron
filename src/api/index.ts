@@ -8,3 +8,25 @@ export function userInfo(): AxiosPromise<UserInfo> {
     method: 'get'
   })
 }
+
+
+export function getArticle(id: number): AxiosPromise<any> {
+  return wscn({
+    url: 'apiv1/admin/content/articles/' + id,
+    method: 'get'
+  })
+}
+
+export function getLive(id: number): AxiosPromise<any> {
+  return wscn({
+    url: 'apiv1/admin/content/lives/' + id,
+    method: 'get'
+  })
+}
+
+export function getPush(id: number): AxiosPromise<any> {
+  return wscn({
+    url: 'apiv1/admin/content/pushes/' + id,
+    method: 'get'
+  })
+}

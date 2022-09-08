@@ -22,7 +22,9 @@ export const roleToStatusMap = {
   eic_review_ended_reject: ['firstcheck_modify', 'doublecheck_modify', 'triplecheck_modify']
 }
 
-export type StatusType = keyof (typeof roleToStatusMap)
+export type roleToStatusType = keyof (typeof roleToStatusMap)
+
+export type StatusType = roleToStatusType | 'published' | 'draft' | 'eic_review_l1_reject' | 'deleted'
 
 export const examineRoles = ['firstcheck_modify', 'doublecheck_modify', 'triplecheck_modify', 'finalcheck_modify']
 

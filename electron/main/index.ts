@@ -1,9 +1,11 @@
 import { app, BrowserWindow, shell, IpcRendererEvent } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
-import createTray, { flashing } from './tray'
+import createTray from './tray'
 import initProtocol from './protocol'
-import initStore from './store'
+import initMessageCenter from './message'
+import { autoUpdater } from 'electron-updater'
+import log from 'electron-log'
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -32,7 +34,7 @@ let win: BrowserWindow | null = null
 let winWrapper = {
   value: null
 }
-let tray = null
+
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL as string
@@ -42,8 +44,8 @@ const indexHtml = join(ROOT_PATH.dist, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: '通知',
-    width: 1920,
-    height: 1080,
+    // width: 1920,
+    // height: 1080,
     // alwaysOnTop: true,
     webPreferences: {
       preload,
@@ -64,6 +66,7 @@ async function createWindow() {
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   }
+  win.webContents.openDevTools()
 
   win.on('close', (e) => {
     if (!isAppQuitting) {
@@ -85,11 +88,10 @@ async function createWindow() {
 }
 
 initProtocol(app, winWrapper)
-
+app.setName('wallstreetcn')
 app.whenReady().then(createWindow).then((win) => {
-  tray = createTray(win)
-  // let close =  flashing(tray)
-  initStore(win)
+  createTray(win)
+  initMessageCenter(win)
 }).catch(console.error)
 
 
@@ -123,7 +125,8 @@ app.on('before-quit', () => {
 
 declare global {
   interface Window {
-    onOpenUrl: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => void
+    onOpenUrl: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => void,
+    onNewExamineMessage: (callback: (event: IpcRendererEvent, ...args: any[]) => void) => void,
   }
 }
 

@@ -6,15 +6,13 @@ import useEximineRealTimeNotice, { genEditUrl } from './hook/useEximineRealTimeN
 import { statusFilter  } from './utils/status'
 import { parseTime } from './utils/time'
 import { resouceMap } from './utils/constant'
-import { Close } from '@element-plus/icons-vue'
-
 
 import type { ResourceType } from './utils/constant'
 import type { ExamineNotice } from './hook/useEximineRealTimeNotice'
 
 const { login, isLogin } = useLogin()
 const { getInfo } = useUserInfo()
-const { initEximineRealTimeNotice, newExamineMessage, examineMessages } = useEximineRealTimeNotice()
+const { initEximineRealTimeNotice, review, examineMessages } = useEximineRealTimeNotice()
 window.onOpenUrl((_event, value) => {
   let url = new URL(value)
   let token = url.searchParams.get('token')
@@ -40,23 +38,32 @@ const goDetailPage = (item: ExamineNotice) => {
   window.open(url, '_blank')
 }
 
+
 init()
 </script>
 
 <template>
   <div class="container">
-    <div class="header">
+    <!-- <div class="header">
       <span>通知</span>
-      <el-icon :size="24" :color="'black'"><Close /></el-icon>
-    </div>
-    <el-button v-if="!isLogin" @click="login"  >登录</el-button>
+    </div> -->
+    <template v-if="!isLogin">
+      <p>没有权限</p>
+      <el-button  @click="login"  >登录</el-button>
+    </template>
+    <p v-else-if="examineMessages.length === 0" >
+      当前没新的待审核的通知
+    </p>
     <ul class="list" v-else >
       <li class="item" v-for="item in examineMessages" :key="item.resource_id">
         <span class="item_front" >{{ parseTime(item.received_at, '{y}-{m}-{d} {h}:{i}') }}</span>
         <span class="item_middle" @click="goDetailPage(item)" >{{`${statusFilter(item.to_status).label} - 【${resouceMap[item.resource_type as ResourceType] || ''}】${item.title}`}}</span>
         <span class="item_back" >
-          <el-button size="small" type="primary">通过</el-button>
-          <el-button size="small" type="danger">驳回</el-button>
+          <!-- <ReviewStatus
+            :status="item.from_status"
+            :loading="false"
+            @review="review($event, item)"
+          /> -->
         </span>
       </li>
     </ul>
@@ -109,7 +116,6 @@ init()
   border-bottom: 1px solid #eee;
 
   .item_front {
-    width: 100px;
     text-align: left;
   }
 
@@ -122,7 +128,7 @@ init()
   }
 
   .item_back {
-    width: 200px;
+    width: 100px;
     display: flex;
     align-items: center;
     justify-content: flex-end;

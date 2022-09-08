@@ -1,13 +1,18 @@
 import { reactive, nextTick, toRefs } from 'vue'
 import { state as userInfo } from './useUserInfo'
 import { ElMessage } from 'element-plus'
+import { ipcRenderer } from 'electron'
 
+import type { ReviewPayload } from '../components/ReviewStatus'
 import {
   roleWeightMap,
   roleToStatusMap,
   examineRoles,
   roleNameMap,
-  StatusType
+} from '../utils/constant'
+import type {
+  roleToStatusType,
+  StatusType,
 } from '../utils/constant'
 
 let socket: WebSocket | null = null
@@ -36,7 +41,16 @@ const state = reactive(initState)
 
 const setExamineMessage = (message: ExamineNotice) => {
   state.newExamineMessage = message
-  state.examineMessages.unshift(message)
+
+  const existIndex = state.examineMessages.findIndex(item => item.resource_id === message.resource_id)
+  if (existIndex === -1) {
+    state.examineMessages.unshift(message)
+  } else {
+    state.examineMessages.splice(existIndex, 1)
+    state.examineMessages.unshift(message)
+  }
+
+  ipcRenderer.send('examine-message', message)
 }
 
 // ------------------------------
@@ -69,7 +83,7 @@ const currentExamineRole = (roles: string[]) => {
   return roles.filter(role => examineRoles.indexOf(role) >= 0)
 }
 
-const couldSendExamineMessage = (to_status: StatusType, display_user_id: number) => {
+const couldSendExamineMessage = (to_status: roleToStatusType, display_user_id: number) => {
   let shouldSendMessageToCheck = false
     let shouldSendMessageToAuthor = false
     // 给审核人员
@@ -168,8 +182,21 @@ const useEximineRealTimeNotice = () => {
     }
   }
 
+  let isAuditting = false
+  const review = (value: ReviewPayload, item: ExamineNotice) => {
+    if (isAuditting) {
+      ElMessage.error('正在审核中，请稍后')
+      return
+    }
+
+    const itemForm = {
+      id: item.resource_id,
+    }
+  }
+
   return {
     initEximineRealTimeNotice,
+    review,
     ...toRefs(state)
   }
 }

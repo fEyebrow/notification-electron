@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "main": "dist/electron/main/index.js",
   "description": "见闻审核通知桌面版",
+  "author": "上海阿牛信息科技有限公司",
+  "private": true,
   "scripts": {
     "dev": "vite  --mode dev",
-    "build": "vue-tsc --noEmit && vite build --mode prod&& electron-builder"
+    "build:sit": "vue-tsc --noEmit && vite build --mode dev&& electron-builder",
+    "build:pord": "vue-tsc --noEmit && vite build --mode prod&& electron-builder"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
@@ -16,7 +19,7 @@
     "axios": "^0.27.2",
     "electron": "^20.0.2",
     "electron-builder": "^23.3.3",
-    "electron-store": "^8.1.0",
+    "electron-updater": "^5.2.1",
     "element-plus": "^2.2.16",
     "sass": "^1.54.8",
     "typescript": "^4.7.4",
@@ -33,5 +36,9 @@
       "VITE_DEV_SERVER_PORT": 3344,
       "VITE_DEV_SERVER_URL": "http://127.0.0.1:3344"
     }
+  },
+  "dependencies": {
+    "electron-log": "^4.4.8",
+    "electron-store": "^8.1.0"
   }
 }

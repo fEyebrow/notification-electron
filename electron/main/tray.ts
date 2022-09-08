@@ -1,10 +1,13 @@
 import { app, BrowserWindow, Menu, Tray, nativeImage } from 'electron'
 import { join } from 'path'
 import { ROOT_PATH } from './index'
+import DB from './store'
 
+let tray
 const createTray = (win: BrowserWindow) => {
   const image = nativeImage.createFromPath(join(ROOT_PATH.public, 'icons/icon.png')).resize({ width: 20, height: 20 })
-  let tray = new Tray(image)
+  tray = new Tray(image)
+  const options = app.getLoginItemSettings()
   const menu = Menu.buildFromTemplate([
         {
           click: () => {
@@ -14,15 +17,24 @@ const createTray = (win: BrowserWindow) => {
         },
         {
           click: () => {
-
+            const checked = Boolean(DB.get('notification'))
+            DB.set('notification', !checked)
           },
           label: '通知',
+          type: 'checkbox',
+          checked: Boolean(DB.get('notification')),
         },
         {
           click: () => {
-
+            const options = app.getLoginItemSettings()
+            app.setLoginItemSettings({
+              openAtLogin: !options.openAtLogin,
+            })
+            menu.items[2].checked = !options.openAtLogin
           },
           label: '开机启动',
+          checked: options.openAtLogin,
+          type: 'checkbox'
         },
         {
           label: '退出',
@@ -34,13 +46,17 @@ const createTray = (win: BrowserWindow) => {
       ])
   tray.setToolTip('华尔街见闻')
   tray.setContextMenu(menu)
+
   return tray
 }
-export const flashing = (tray: Tray) => {
+
+export const flashing = () => {
+  let intervalId
+
   let count = 0
   const image = nativeImage.createFromPath(join(ROOT_PATH.public, 'icons/icon.png')).resize({ width: 20, height: 20 })
   const blankImage = nativeImage.createFromPath(join(ROOT_PATH.public, 'icons/blank.png')).resize({ width: 20, height: 20 })
-  let intervalId = setInterval(() => {
+  intervalId = setInterval(() => {
 
     if (count % 2 === 0) {
       tray.setImage(image)
@@ -49,8 +65,11 @@ export const flashing = (tray: Tray) => {
     }
     count++
   }, 500)
+
   return () => {
     clearInterval(intervalId)
+    intervalId = null
+    tray.setImage(image)
   }
 }
 

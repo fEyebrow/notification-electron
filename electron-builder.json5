@@ -2,7 +2,7 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "com.wallstreencn.check",
+  "appId": "com.wallstreencn.notification",
   "productName": "华尔街见闻审核中心",
   "asar": true,
   "directories": {
@@ -19,6 +19,7 @@
     ]
   },
   "win": {
+    "icon": "public/icons/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -30,15 +31,31 @@
     "artifactName": "${productName}_${version}.${ext}"
   },
   "nsis": {
+    "installerIcon": "public/icons/icon.ico",
+    "uninstallerIcon": "public/icons/icon.ico",
+    "createDesktopShortcut": true,
+    "allowElevation": true,
     "oneClick": false,
     "perMachine": false,
+    "installerLanguages": "zh_CN",
+    "language": "2052",
+    "displayLanguageSelector": true,
     "allowToChangeInstallationDirectory": true,
-    "deleteAppDataOnUninstall": false
+    "deleteAppDataOnUninstall": false,
+    "runAfterFinish": true,
+    "shortcutName": "华尔街见闻"
   },
   "protocols": [
     {
       "name": "Wscn check",
       "schemes": ["wscn-notification"]
     }
-  ]
+  ],
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "https://download.wallstreetcn.com/"
+    }
+  ],
+  "generateUpdatesFilesForAllChannels": true
 }

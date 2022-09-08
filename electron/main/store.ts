@@ -1,7 +1,8 @@
 import Store from 'electron-store'
 import { ipcMain, BrowserWindow } from 'electron'
 
-const store = new Store();
+const DB = new Store();
+export default DB
 // const COOKIES_KEY = 'COOKIES'
 
 // function listenCookies(win: BrowserWindow) {
@@ -39,18 +40,3 @@ const store = new Store();
 //     })
 //   }
 // }
-
-
-export default function initStore(win: BrowserWindow) {
-  // ipcMain.on('set', (event, key, value) => {
-  //   store.set(key, value)
-  // })
-  // ipcMain.on('delete', (event, key) => {
-  //   store.delete(key)
-  // })
-  // ipcMain.on('get', (event, key) => {
-  //   event.returnValue = store.get(key)
-  // })
-
-  return store
-}
